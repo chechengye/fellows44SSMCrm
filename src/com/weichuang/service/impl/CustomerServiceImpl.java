@@ -1,0 +1,57 @@
+package com.weichuang.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.weichuang.mapper.CustomerMapper;
+import com.weichuang.pojo.Customer;
+import com.weichuang.pojo.CustomerExample;
+import com.weichuang.service.CustomerService;
+import com.weichuang.utils.Page;
+import com.weichuang.vo.QueryVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class CustomerServiceImpl implements CustomerService {
+
+    @Autowired
+    CustomerMapper customerMapper;
+    /**
+     * 根据查询条件获取数据
+     * @param vo
+     * @return
+     */
+    @Override
+    public Page getCustomerListByQueryVo(QueryVo vo) {
+        Page<Customer> page = new Page<>();
+        CustomerExample customerExample = new CustomerExample();
+        CustomerExample.Criteria criteria = customerExample.createCriteria();
+        if(vo != null){
+            if(vo.getPage() > 0){
+                page.setPage(vo.getPage());
+            }
+            vo.setMaxCount(10);
+            page.setSize(vo.getMaxCount());
+            if(null != vo.getCustName() && !"".equals(vo.getCustName())){
+                criteria.andCustNameLike("%" + vo.getCustName() + "%");
+            }
+            if(null != vo.getCustIndustry() && !"".equals(vo.getCustIndustry())){
+                criteria.andCustIndustryEqualTo(vo.getCustIndustry());
+            }
+
+            if(null != vo.getCustLevel() && !"".equals(vo.getCustLevel())){
+                criteria.andCustLevelEqualTo(vo.getCustLevel());
+            }
+            if(null != vo.getCustSource() && !"".equals(vo.getCustSource())){
+                criteria.andCustSourceEqualTo(vo.getCustSource());
+            }
+            page.setTotal(((Long)customerMapper.countByExample(customerExample)).intValue());
+        }
+        PageHelper.startPage(page.getPage() , page.getSize());
+        //逆向工程本身不支持分页操作 （与分页插件进行配合使用）
+        List<Customer> customerList = customerMapper.selectByExample(customerExample);
+        page.setRows(customerList);
+        return page;
+    }
+}
