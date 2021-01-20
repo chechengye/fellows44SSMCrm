@@ -54,4 +54,29 @@ public class CustomerServiceImpl implements CustomerService {
         page.setRows(customerList);
         return page;
     }
+
+    /**
+     * 根据id获取客户信息
+     * @param id
+     * @return
+     */
+    @Override
+    public Customer getCustomerById(Long id) {
+        return customerMapper.selectByPrimaryKey(id);
+    }
+
+    /**
+     * 根据主键修改客户信息
+     * @param customer
+     * @return
+     */
+    @Override
+    public int customerUpdate(Customer customer) {
+        return customerMapper.updateByPrimaryKey(customer);
+    }
+
+    @Override
+    public int customerDeleteById(Long id) {
+        return customerMapper.deleteByPrimaryKey(id);
+    }
 }
